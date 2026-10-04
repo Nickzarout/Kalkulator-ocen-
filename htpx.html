@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liczenie oceny</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="number-box">
+      <label for="score">Wpisz ocenę</label>
+
+      <div class="input-row">
+        <textarea id="score" rows="1" placeholder="np. 6"></textarea>
+        <button type="button" id="addNumber">Oblicz</button>
+      </div>
+
+      <p class="result">Wartość: <span>0</span></p>
+    </div>
+
+    <script>
+      const input = document.getElementById('score');
+      const button = document.getElementById('addNumber');
+      const result = document.querySelector('.result span');
+
+      const gradeValues = {
+        1: -10,
+        2: -7,
+        3: -5,
+        4: 0,
+        5: 5,
+        6: 10,
+      };
+
+      function autoResize() {
+        input.style.height = 'auto';
+        input.style.height = input.scrollHeight + 'px';
+      }
+
+      function calculateGradeValue(grade) {
+        if (gradeValues[grade] !== undefined) {
+          return gradeValues[grade];
+        }
+
+        return 0;
+      }
+
+      function calculateExpression(value) {
+        const cleaned = value.replace(/\s+/g, '');
+        const parts = cleaned.split(/([+-])/).filter(Boolean);
+        let total = 0;
+        let sign = 1;
+
+        for (const part of parts) {
+          if (part === '+' || part === '-') {
+            sign = part === '+' ? 1 : -1;
+            continue;
+          }
+
+          const number = Number(part);
+
+          if (Number.isNaN(number)) {
+            return NaN;
+          }
+
+          total += sign * calculateGradeValue(number);
+        }
+
+        return total;
+      }
+
+      function addNumber() {
+        const value = input.value.trim();
+
+        if (value === '') {
+          input.focus();
+          return;
+        }
+
+        const total = calculateExpression(value);
+
+        if (!Number.isNaN(total)) {
+          result.textContent = total;
+          input.value = '';
+          autoResize();
+          input.focus();
+        }
+      }
+
+      input.addEventListener('input', autoResize);
+      button.addEventListener('click', addNumber);
+      input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          addNumber();
+        }
+      });
+
+      autoResize();
+    </script>
+  </body>
+</html>
